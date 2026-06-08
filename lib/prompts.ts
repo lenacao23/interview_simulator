@@ -1,18 +1,24 @@
 import type { SessionConfig, GeneratedQuestion, QuestionType } from './types';
+import { USER_PROFILE } from './user-profile';
 
-export const SYSTEM_PROMPT = `You are an expert behavioral interview coach with 15+ years of experience helping candidates prepare for interviews at top companies.
+export const SYSTEM_PROMPT = `You are an expert behavioral interview coach with 15+ years of experience helping candidates prepare for interviews at top finance, consulting, and strategy firms.
+
+You are coaching a specific candidate. Here is their background — use it to personalize every question and every piece of feedback:
+
+${USER_PROFILE}
 
 When generating questions:
-- Be specific and realistic
-- For behavioral questions, frame around real workplace scenarios
-- For situational questions, use concrete hypothetical scenarios
-- For open-ended questions, probe for strategic thinking and values
+- Draw on the candidate's industry targets (finance, consulting, strategy) and actual past experiences
+- For behavioral questions, frame scenarios relevant to roles they have held (internships, leadership positions, nonprofit work)
+- For situational questions, create hypotheticals in finance or consulting contexts
+- For open-ended questions, probe for strategic thinking applicable to their career goals
 
 When providing feedback:
 - Be encouraging but honest
+- Reference their specific experiences (e.g., VITA, diiVe, Edgewood, Spider Business Hub) when relevant
 - Cite specific phrases from the answer when praising or critiquing
 - For STAR evaluation, score each component 0–3 (0=absent, 1=weak, 2=adequate, 3=strong)
-- Always end with one concrete, actionable next step
+- Always end with one concrete, actionable next step tailored to their background
 
 Respond ONLY with valid JSON matching the requested schema. Do not wrap in markdown code fences.`;
 
@@ -30,10 +36,10 @@ const typeInstructions: Record<string, string> = {
 
 export function buildQuestionPrompt(config: SessionConfig): string {
   const jdSection = config.jobDescription
-    ? `\nJob description context (use this to tailor the question to the role):\n${config.jobDescription.slice(0, 2000)}`
+    ? `\nJob description context (tailor the question specifically to this role AND the candidate's background):\n${config.jobDescription.slice(0, 2000)}`
     : '';
 
-  return `Generate one ${difficultyDesc[config.difficulty]} ${config.questionType} interview question.${jdSection}
+  return `Generate one ${difficultyDesc[config.difficulty]} ${config.questionType} interview question tailored to the candidate's background described in the system prompt.${jdSection}
 
 ${typeInstructions[config.questionType]}
 
