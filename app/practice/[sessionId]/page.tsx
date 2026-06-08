@@ -6,6 +6,7 @@ import { useSession } from '@/hooks/useSession';
 import { saveSession } from '@/lib/storage';
 import { QuestionCard } from '@/components/practice/QuestionCard';
 import { MultipleChoiceOptions } from '@/components/practice/MultipleChoiceOptions';
+import { VoiceRecorder } from '@/components/practice/VoiceRecorder';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import type { FeedbackResult } from '@/lib/types';
@@ -107,15 +108,24 @@ export default function PracticeSessionPage() {
           ))}
         </div>
 
-        <div className="p-5">
+        <div className="p-5 space-y-4">
           {answerMode === 'freeform' ? (
-            <textarea
-              value={freeformAnswer}
-              onChange={(e) => setFreeformAnswer(e.target.value)}
-              placeholder="Take your time. For behavioral questions, use the STAR method: Situation, Task, Action, Result."
-              rows={8}
-              className="w-full text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
-            />
+            <>
+              <VoiceRecorder
+                onTranscript={(text) => {
+                  setFreeformAnswer((prev) =>
+                    prev.trim() ? prev.trimEnd() + ' ' + text : text
+                  );
+                }}
+              />
+              <textarea
+                value={freeformAnswer}
+                onChange={(e) => setFreeformAnswer(e.target.value)}
+                placeholder="Take your time. For behavioral questions, use the STAR method: Situation, Task, Action, Result."
+                rows={8}
+                className="w-full text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
+              />
+            </>
           ) : (
             <MultipleChoiceOptions
               options={session.question.mcqOptions}
